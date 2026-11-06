@@ -1,5 +1,7 @@
 # NEXUS IDS — Network Threat Detection & Analysis System
 
+<img width="1440" height="1000" alt="01-nexus-ids-desktop" src="https://github.com/user-attachments/assets/9258a521-7a7d-4153-b13c-bb2f3876ba46" />
+
 NEXUS IDS is a Python-based network packet analysis and rule-driven intrusion detection project. The local web console uses a restrained steel-blue and slate interface designed for practical security operations rather than decorative effects. It combines a command-line analyzer with an optional local web console for offline PCAP/PCAPNG investigation, alert review, and CSV reporting.
 
 > **Attribution and license:** The packet parser, flow engine, filter language, IDS engine, original CLI, rules, and original test suite are based on the upstream MIT-licensed project by Kaan Dinç: [kaan0d/sentinel](https://github.com/kaan0d/sentinel). The upstream copyright and MIT license are retained in [`LICENSE.md`](LICENSE.md). This repository adds the web console, its API, persistence layer, tests, and updated documentation. Review the source and commit history before describing individual components as independently authored.
