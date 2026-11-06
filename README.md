@@ -29,27 +29,100 @@ NEXUS IDS is a Python-based network packet analysis and rule-driven intrusion de
 
 ## Architecture
 
-```text
-PCAP / PCAPNG ──┬── CLI (read / flows / ids / live)
-                │
-                └── Web upload API (FastAPI)
-                           │
-                    Capture validation
-                           │
-                    Packet reader / decoder
-                           │
-                      Flow processing
-                           │
-                 IDS engine + TOML rules
-                           │
-                    Detection evidence
-                           │
-                SQLite alert metadata store
-                           │
-                 NEXUS IDS web dashboard
-                           │
-                    CSV report export
-```
+
+                         NEXUS IDS
+             NETWORK THREAT DETECTION SYSTEM
+                              |
+             +----------------+----------------+
+             |                                 |
+      COMMAND-LINE INTERFACE             WEB CONSOLE
+             |                                 |
+      +------+-------+                  FastAPI Application
+      |      |       |                         |
+     READ  FLOWS    IDS / LIVE          Capture Upload API
+      |      |       |                         |
+      |      |       |                  Input Validation
+      |      |       |                         |
+      +------+-------+-------------------------+
+                     |
+              PACKET PROCESSING
+                     |
+             +-------+--------+
+             |                |
+       PCAP / PCAPNG      LIVE CAPTURE
+       File Processing    (CLI / Supported OS)
+             |                |
+             +-------+--------+
+                     |
+              PACKET DECODING
+                     |
+       +-------------+--------------+
+       |             |              |
+    Ethernet      Network       Transport
+    ARP           IPv4/IPv6      TCP / UDP
+                                ICMP
+       |             |              |
+       +-------------+--------------+
+                     |
+              PROTOCOL ANALYSIS
+                     |
+       +-------------+--------------+
+       |             |              |
+      DNS           HTTP           TLS
+       |             |              |
+       +-------------+--------------+
+                     |
+              FLOW PROCESSING
+                     |
+       +-------------+--------------+
+       |                            |
+   Flow Analysis              TCP Stream
+                              Reassembly
+       |                            |
+       +-------------+--------------+
+                     |
+              IDS DETECTION ENGINE
+                     |
+          +----------+-----------+
+          |          |           |
+       Detector   Rule Engine   Thresholds
+       Modules    (Python)      / Windows
+          |          |           |
+          +----------+-----------+
+                     |
+              TOML RULE CONFIGURATION
+                     |
+              DETECTION EVALUATION
+                     |
+              ALERT GENERATION
+                     |
+          +----------+-----------+
+          |                      |
+    Alert Classification    Detection Evidence
+    Severity / Type          Source / Destination
+          |                      |
+          +----------+-----------+
+                     |
+              ALERT MANAGEMENT
+                     |
+          +----------+-----------+
+          |                      |
+     SQLite Storage        Alert Processing
+          |                      |
+          +----------+-----------+
+                     |
+               WEB CONSOLE
+                     |
+          +----------+-----------+
+          |                      |
+      Alert Dashboard       Alert History
+          |                      |
+          +----------+-----------+
+                     |
+              REPORT GENERATION
+                     |
+                 CSV EXPORT
+                 
 
 ## Technology
 
