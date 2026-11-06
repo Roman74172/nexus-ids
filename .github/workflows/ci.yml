@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: python -m pip install -e ".[dev,web]"
+      - name: Lint
+        run: ruff check .
+      - name: Format
+        run: ruff format --check .
+      - name: Types
+        run: mypy
+      - name: Tests
+        run: python -m pytest
+      - name: Fuzz (the seed is the run number, so a failure can be repeated)
+        run: python -m tools.fuzz --iterations 200000 --seed ${{ github.run_number }}
+      - name: Benchmark (for information only, the numbers depend on the runner)
+        run: python -m tools.bench --packets 20000 --repeat 1
+
+  live-capture:
+    name: Live capture on a real interface
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: python -m pip install -e ".[dev,web]"
+      - name: Capture on the loopback interface (needs root)
+        shell: bash
+        run: |
+          sudo "$(which python)" -m pytest tests/test_live_linux.py -v -rs | tee live.txt
+          # The tests that need root must have run, not been skipped.
+          ! grep -q "needs Linux and root" live.txt
+
+  live-capture-windows:
+    name: Live capture on Windows (the runner is an Administrator)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: python -m pip install -e ".[dev,web]"
+      - name: Capture on the loopback address
+        shell: bash
+        run: |
+          python -m pytest tests/test_live_windows.py -v -rs | tee live.txt
+          # The tests that need Administrator rights must have run, not been skipped.
+          ! grep -q "needs Windows and Administrator rights" live.txt

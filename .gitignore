@@ -1,0 +1,13 @@
+/developing
+__pycache__/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.pcap
+/graphify-out
+/sentinel-samples
+*.sqlite3
+*.db
+.env
+.DS_Store
